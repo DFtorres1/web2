@@ -1,23 +1,33 @@
 import asyncio
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from rabbitmq.producer import send_message
+from rabbitmq.consumer import consume
 from api.Endpoints.Activities.activity import activity_router
+
 from api.Endpoints.Review.review import reviews
-from consumidor.activity_consumer import consume_nats, nats_data
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    task = asyncio.create_task(consume())
 
-# @app.on_event("startup")
-# async def startup_event():
-#     """Inicia el consumidor NATS cuando la API arranca."""
-#     loop = asyncio.get_event_loop()
-#     loop.create_task(consume_nats())
+    yield
 
-# @app.get("/nats-data", tags=["NATS"])
-# def get_nats_data():
-#     """Devuelve los datos recibidos desde NATS en JSON."""
-#     return {"nats_messages": nats_data}
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        print("RabbitMQ consumer task cancelled")
 
+
+app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/")
+async def root():
+    await send_message({"pattern": {"cmd": "get_user_by_id"}, "data": 1})
+    return {"message": "FastAPI microservice connected to RabbitMQ"}
 
 router_list = [
     activity_router,
@@ -26,5 +36,3 @@ router_list = [
 
 for router in router_list:
     app.include_router(router)
-
-app.include_router(activity_router)

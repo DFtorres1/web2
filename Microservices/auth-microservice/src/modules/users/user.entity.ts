@@ -16,6 +16,6 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
-  @Column({ type: 'set', enum: Role, default: [Role.Tourist] })
+  @Column({ type: 'enum', enum: Role, default: [Role.Tourist] })
   roles: Role[];
 }

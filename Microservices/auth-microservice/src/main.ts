@@ -7,20 +7,21 @@ async function bootstrap() {
     const app = await NestFactory.createMicroservice<MicroserviceOptions>(
       AppModule,
       {
-        transport: Transport.NATS,
+        transport: Transport.RMQ,
         options: {
-          host: process.env.BACKEND_URL,
-          port: process.env.PORT ?? 3000,
+          urls: process.env.RABBITMQ_URI?.split(','),
+          queue: process.env.RABBITMQ_USERS_QUEUE,
+          queueOptions: {
+            durable: true,
+          },
         },
       },
     );
-    // app.enableCors({
-    //   origin: process.env.FRONTEND_URL,
-    //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    //   credentials: true,
-    // });
+
     await app.listen();
-    console.log(`Application running on: ${await 30}`);
+    console.log(
+      `Users microservice is listening to RabbitMQ queue "${process.env.RABBITMQ_USERS_QUEUE}"`,
+    );
   } catch (error) {
     console.error('Error during application bootstrap: ', error);
     process.exit(1);
