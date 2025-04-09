@@ -1,9 +1,29 @@
 import asyncio
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from rabbitmq.consumer import consume
 from api.Endpoints.Activities.activity import activity_router
 from consumidor.activity_consumer import consume_nats, nats_data
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 👇 Arranca el consumidor de RabbitMQ
+    task = asyncio.create_task(consume())
+
+    yield
+
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        print("RabbitMQ consumer task cancelled")
+
 app = FastAPI()
+
+
+@app.get("/")
+async def root():
+    return {"message": "FastAPI microservice connected to RabbitMQ"}
 
 # @app.on_event("startup")
 # async def startup_event():
