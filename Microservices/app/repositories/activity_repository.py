@@ -1,4 +1,5 @@
 from sqlite3 import IntegrityError
+from uuid import UUID
 from sqlalchemy.orm import Session
 from models.activity_model import Activity
 from schemas.activity import ActivityBase
@@ -33,3 +34,26 @@ def filter_activities(db: Session, title: str = None, price: int = None):
         query = query.filter(Activity.price == price)
 
     return query.all()
+
+
+def delete_activity(id: UUID, db: Session):
+    activity = db.query(Activity).filter(Activity.id == id).first()
+    if activity:
+        db.delete(activity)
+        db.commit()
+    else:
+        raise ValueError("Activity not found.")
+    
+
+def update_activity(id: UUID, db: Session, activity: ActivityBase):
+    activity_to_update = db.query(Activity).filter(Activity.id == id).first()
+    
+    if not activity_to_update:
+        raise ValueError("Activity not found.")
+
+    for key, value in activity.dict().items():
+        setattr(activity_to_update, key, value)
+
+    db.commit()
+    db.refresh(activity_to_update)
+    return activity_to_update

@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from uuid import UUID
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from config.DB.db import SessionLocal
@@ -8,7 +10,7 @@ from schemas.activity import ActivityBase, GetActivity
 import asyncio
 import nats
 
-from service.activity import create, filter_activity_service, get_activity
+from service.activity import create, delete, filter_activity_service, get_activity, relevant, update
 
 
 activity_router = APIRouter()
@@ -27,48 +29,54 @@ def get_db():
 #     return get_nats_connection.nc
 
 
-@activity_router.get('/activities', tags=['Activity'], response_model=List[GetActivity], status_code=200)
-def get_activities(db: Session = Depends(get_db)):
-    return get_activity(db)
-
-
-@activity_router.get('/getActivities', tags=['Mala practica'], response_model=List[GetActivity], status_code=200)
-def get_activities(db: Session = Depends(get_db)):
-    return get_activity(db)
-
-
 @activity_router.post('/activities', tags=['Activity'], response_model=ActivityBase, status_code=201)
-def create_activity(activity: ActivityBase, db: Session = Depends(get_db)):
+def create_activity_post(activity: ActivityBase, db: Session = Depends(get_db)):
     return create(db=db, activity=activity)
+
+
+@activity_router.get('/activities', tags=['Activity'], response_model=List[GetActivity], status_code=200)
+def get_activities_list(db: Session = Depends(get_db)):
+    return get_activity(db)
+
+
+@activity_router.get('/activities-by', tags=['Activity'], response_model=List[GetActivity], status_code=200)
+def filter_activities(db: Session = Depends(get_db), title: Optional[str] = Query(None), price: Optional[int] = Query(None)):
+    return filter_activity_service(db=db, title=title, price=price)
+
+
+@activity_router.delete('/activities/{id}', tags=['Activity'])
+def delete_activity_by_id(id:UUID, db: Session = Depends(get_db)):
+    return delete(id, db)
+
+
+@activity_router.put('/activity/{id}', tags=['Activity'], response_model=ActivityBase, status_code=200)
+def update_activity_by_id(id: UUID, activity: ActivityBase, db: Session = Depends(get_db)):
+    return update(id=id, activity=activity, db=db)
+
+
+@activity_router.get('/relevat_activity', tags=['Activity'], response_model=List[ActivityBase])
+def get_relevat_activity(db: Session = Depends(get_db)):
+    return JSONResponse(content=jsonable_encoder({'message':relevant(db)}))
+
+
 
 
 @activity_router.post('/createActivities', tags=['Mala practica'], response_model=ActivityBase, status_code=201)
 def create_activity(activity: ActivityBase, db: Session = Depends(get_db)):
     return create(db=db, activity=activity)
 
-
-@activity_router.get('/activities-by', tags=['Activity'], response_model=List[GetActivity], status_code=200)
-def filter_activities_endpoint(
-    db: Session = Depends(get_db),
-    title: Optional[str] = Query(None, description="Filter by title"),
-    price: Optional[int] = Query(None, description="Filter by price")
-):
-    return filter_activity_service(db=db, title=title, price=price)
-
-
-# ✅ GET: Buscar actividades por precio
-
-
 @activity_router.get('/activities-by-price/{price}', tags=['Mala practica'], response_model=List[ActivityBase], status_code=200)
 def get_activities_by_price(price: int, db: Session = Depends(get_db)):
     return db.query(Activity).filter(Activity.price == price).all()
 
-# ✅ GET: Buscar actividades por título
-
-
 @activity_router.get('/activities-by-title/{title}', tags=['Mala practica'], response_model=List[ActivityBase], status_code=200)
 def get_activities_by_title(title: str, db: Session = Depends(get_db)):
     return db.query(Activity).filter(Activity.title == title).all()
+
+@activity_router.get('/getActivities', tags=['Mala practica'], response_model=List[GetActivity], status_code=200)
+def get_activities(db: Session = Depends(get_db)):
+    return get_activity(db)
+
 
 
 # 🟢 Obtener actividades y enviarlas a NATS
