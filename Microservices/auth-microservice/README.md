@@ -2,6 +2,10 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
+<p>
+docker run -d --hostname web-two-rmq --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+</p>
+
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
