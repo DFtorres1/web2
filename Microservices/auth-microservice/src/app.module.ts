@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersRMQModule } from './modules/users/usersrmq.module';
+import { RabbitMQModule } from './modules/rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
+    UsersRMQModule,
+    RabbitMQModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',

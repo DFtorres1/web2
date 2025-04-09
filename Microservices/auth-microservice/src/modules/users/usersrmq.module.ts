@@ -11,4 +11,4 @@ import { UsersController } from './controllers/users.controller';
   providers: [AuthService, UsersService],
   exports: [AuthService, AuthController],
 })
-export class UsersHttpModule {}
+export class UsersRMQModule {}
