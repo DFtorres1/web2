@@ -12,7 +12,7 @@ async function bootstrap() {
           urls: process.env.RABBITMQ_URI?.split(','),
           queue: process.env.RABBITMQ_USERS_QUEUE,
           queueOptions: {
-            durable: false,
+            durable: true,
           },
         },
       },
