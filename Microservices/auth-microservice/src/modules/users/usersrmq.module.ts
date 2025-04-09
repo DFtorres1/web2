@@ -9,6 +9,6 @@ import { UsersController } from './controllers/users.controller';
   imports: [UsersModule],
   controllers: [AuthController, UsersController],
   providers: [AuthService, UsersService],
-  exports: [AuthService, AuthController],
+  exports: [AuthService, UsersService],
 })
 export class UsersRMQModule {}

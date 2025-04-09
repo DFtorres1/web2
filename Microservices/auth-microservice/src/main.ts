@@ -20,7 +20,7 @@ async function bootstrap() {
 
     await app.listen();
     console.log(
-      `Users microservice is listening to RabbitMQ queue "${process.env.RABBITMQ_QUEUE}"`,
+      `Users microservice is listening to RabbitMQ queue "${process.env.RABBITMQ_USERS_QUEUE}"`,
     );
   } catch (error) {
     console.error('Error during application bootstrap: ', error);
