@@ -11,6 +11,7 @@ class Settings(BaseSettings):
 
     RABBITMQ_URI: str
     RABBITMQ_USERS_QUEUE: str
+    RABBITMQ_FASTAPI_QUEUE: str
 
     model_config = SettingsConfigDict(env_file='.env')
 

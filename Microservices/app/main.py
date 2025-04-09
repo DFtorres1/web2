@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
         print("RabbitMQ consumer task cancelled")
 
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
@@ -36,5 +36,3 @@ router_list = [
 
 for router in router_list:
     app.include_router(router)
-
-app.include_router(activity_router)
