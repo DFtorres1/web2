@@ -1,0 +1,45 @@
+name: Push hook
+on: [push]
+
+jobs:
+    build:
+        name: Lint NestJS and FastAPI
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [20.x]
+
+        steps:
+          - uses: actions/checkout@v4
+
+          # Setup para NestJS
+          - name: Use Node.js ${{ matrix.node-version }}
+            uses: actions/setup-node@v4
+            with:
+                node-version: ${{ matrix.node-version }}
+
+          - name: Install NestJS dependencies
+            working-directory: Microservices/auth-microservice
+            run: npm install
+
+          - name: Lint NestJS
+            working-directory: Microservices/auth-microservice
+            run: npm run lint
+
+            # Setup para FastAPI
+          - name: Set up Python
+            uses: actions/setup-python@v5
+            with:
+                python-version: '3.11'
+
+          - name: Install FastAPI dependencies
+            working-directory: Microservices/app
+            run: |
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
+                pip install ruff
+
+          - name: Lint FastAPI with Ruff
+            working-directory: Microservices/app
+            run: ruff .
