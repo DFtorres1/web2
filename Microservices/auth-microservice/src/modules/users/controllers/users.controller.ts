@@ -9,6 +9,7 @@ export class UsersController {
 
   @MessagePattern({ cmd: 'get_user_by_id' })
   getUserById(@Payload() id: number): Promise<User | null> {
+    console.log("ola")
     return this.usersService.findOne(id);
   }
 }

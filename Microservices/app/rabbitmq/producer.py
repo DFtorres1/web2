@@ -1,12 +1,17 @@
+import json
 import aio_pika
-from config.config import RABBITMQ_URI, RABBITMQ_QUEUE_USERS
+from config.DB.conection import settings
+
 
 async def send_message(message: str):
-    connection = await aio_pika.connect_robust(RABBITMQ_URI)
+    connection = await aio_pika.connect_robust(settings.RABBITMQ_URI)
     async with connection:
         channel = await connection.channel()
-        queue = await channel.declare_queue(RABBITMQ_QUEUE_USERS, durable=True)
+        queue = await channel.declare_queue(settings.RABBITMQ_USERS_QUEUE, durable=True)
         await channel.default_exchange.publish(
-            aio_pika.Message(body=message.encode()),
+            aio_pika.Message(
+                body=json.dumps(message).encode()
+            ),
             routing_key=queue.name,
         )
+        print(f"Mensaje enviado a la cola {queue.name}, {message}")
