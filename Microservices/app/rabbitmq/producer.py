@@ -3,7 +3,7 @@ import aio_pika
 from config.DB.conection import settings
 
 
-async def send_message(message: str):
+async def send_message(message: dict):
     connection = await aio_pika.connect_robust(settings.RABBITMQ_URI)
     async with connection:
         channel = await connection.channel()

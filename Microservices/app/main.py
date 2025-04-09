@@ -24,7 +24,7 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    await send_message('{"pattern": "get_user_by_id", "data": 1}')
+    await send_message({"pattern": {"cmd": "get_user_by_id"}, "data": 1})
     return {"message": "FastAPI microservice connected to RabbitMQ"}
 
 app.include_router(activity_router)
