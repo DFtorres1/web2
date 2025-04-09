@@ -9,8 +9,8 @@ async function bootstrap() {
       {
         transport: Transport.RMQ,
         options: {
-          urls: process.env.RABBITMQ_URL?.split(','),
-          queue: 'activities_queue',
+          urls: process.env.RABBITMQ_URI?.split(','),
+          queue: process.env.RABBITMQ_QUEUE,
           queueOptions: {
             durable: false
           },
@@ -23,7 +23,7 @@ async function bootstrap() {
     //   credentials: true,
     // });
     await app.listen();
-    console.log(`Application running on: ${await 30}`);
+    console.log(`Users microservice is listening to RabbitMQ queue "${process.env.RABBITMQ_QUEUE}"`);
   } catch (error) {
     console.error('Error during application bootstrap: ', error);
     process.exit(1);
