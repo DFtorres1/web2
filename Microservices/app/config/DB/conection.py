@@ -1,35 +1,27 @@
-from pydantic_settings import BaseSettings
-from dotenv import load_dotenv
-import os
-
-env_path = '../../.env'
-load_dotenv(dotenv_path=env_path)
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    __DATABASE_URI_FORMAT: str = "{db_engine}://{user}:{password}@{host}:{port}/{database}"
-    __DB_HOST: str = os.getenv("DB_HOST")
-    __DB_USER: str = os.getenv("DB_USER")
-    __DB_PASSWORD: str = os.getenv("DB_PASSWORD")
-    __DB_PORT: str = os.getenv("DB_PORT")
-    __DB_ENGINE: str = os.getenv("DB_ENGINE")
-    __DB_NAME: str = os.getenv("DB_NAME")
+    DATABASE_URI_FORMAT: str = "{db_engine}://{user}:{password}@{host}:{port}/{database}"
+    DB_HOST: str
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_PORT: int
+    DB_ENGINE: str
+    DB_NAME: str
+
+    model_config = SettingsConfigDict(env_file='.env')
 
     @property
     def DATABASE_URL(self) -> str:
-        print(self.__DATABASE_URI_FORMAT)
-        print(self.__DB_HOST)
-        print(self.__DB_USER)
-        print(self.__DB_PASSWORD)
-        print(self.__DB_PORT)
-        print(self.__DB_ENGINE)
-        print(self.__DB_NAME)
-        return self.__DATABASE_URI_FORMAT.format(
-            db_engine=self.__DB_ENGINE,
-            user=self.__DB_USER,
-            password=self.__DB_PASSWORD,
-            host=self.__DB_HOST,
-            port=self.__DB_PORT,
-            database=self.__DB_NAME,
+        print(self.DB_ENGINE)
+        print(self.DB_NAME)
+        return self.DATABASE_URI_FORMAT.format(
+            db_engine=self.DB_ENGINE,
+            user=self.DB_USER,
+            password=self.DB_PASSWORD,
+            host=self.DB_HOST,
+            port=self.DB_PORT,
+            database=self.DB_NAME,
         )
     
 

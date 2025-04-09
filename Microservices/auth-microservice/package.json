@@ -31,6 +31,8 @@
     "@nestjs/microservices": "^11.0.12",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
+    "amqp-connection-manager": "^4.1.14",
+    "amqplib": "^0.10.7",
     "auth-microservice": "file:",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.14.1",

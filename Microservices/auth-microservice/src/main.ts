@@ -7,10 +7,13 @@ async function bootstrap() {
     const app = await NestFactory.createMicroservice<MicroserviceOptions>(
       AppModule,
       {
-        transport: Transport.NATS,
+        transport: Transport.RMQ,
         options: {
-          host: process.env.BACKEND_URL,
-          port: process.env.PORT ?? 3000,
+          urls: process.env.RABBITMQ_URL?.split(','),
+          queue: 'activities_queue',
+          queueOptions: {
+            durable: false
+          },
         },
       },
     );
